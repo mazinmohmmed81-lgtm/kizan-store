@@ -6,12 +6,11 @@ import { useParams, useRouter } from "next/navigation";
 import Link from "next/link";
 
 export default function DealDetailsPage() {
-  const { id } = useParams(); // جلب رقم الصفقة من الرابط
+  const { id } = useParams();
   const [deal, setDeal] = useState<any>(null);
   const [loading, setLoading] = useState(true);
   const router = useRouter();
 
-  // حالات خاصة باقتراح السعر
   const [showPriceInput, setShowPriceInput] = useState(false);
   const [finalPrice, setFinalPrice] = useState("");
   const [actionLoading, setActionLoading] = useState(false);
@@ -42,7 +41,6 @@ export default function DealDetailsPage() {
         console.log(error);
       } else {
         setDeal(data);
-        // إذا كان هناك سعر محفوظ مسبقاً، نضعه في الحقل
         if (data.final_price) {
           setFinalPrice(data.final_price.toString());
         }
@@ -64,7 +62,7 @@ export default function DealDetailsPage() {
       .from("deals")
       .update({
         final_price: parseFloat(finalPrice),
-        status: "pending_approval", // تحديث الحالة إلى بانتظار الموافقة
+        status: "pending_approval",
         updated_at: new Date().toISOString()
       })
       .eq("id", id);
@@ -73,7 +71,6 @@ export default function DealDetailsPage() {
       alert("حدث خطأ: " + error.message);
     } else {
       alert("تم اقتراح السعر النهائي بنجاح! بانتظار موافقة الأطراف.");
-      // تحديث الواجهة محلياً لتجنب إعادة تحميل الصفحة
       setDeal({ ...deal, final_price: finalPrice, status: "pending_approval" });
       setShowPriceInput(false);
     }
