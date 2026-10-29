@@ -10,7 +10,9 @@
   },
   "dependencies": {
     "@supabase/supabase-js": "^2.118.0",
+    "@tailwindcss/postcss": "^4.3.3",
     "next": "15.5.7",
+    "postcss": "^8.5.32",
     "react": "19.3.0",
     "react-dom": "19.3.0"
   },
@@ -22,7 +24,7 @@
     "@types/react-dom": "^19",
     "eslint": "^9",
     "eslint-config-next": "^15.5.7",
-    "tailwindcss": "^4",
+    "tailwindcss": "^4.3.3",
     "typescript": "^5"
   }
 }
