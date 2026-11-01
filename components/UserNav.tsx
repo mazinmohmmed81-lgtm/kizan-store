@@ -7,6 +7,7 @@ import { useRouter } from "next/navigation";
 
 export default function UserNav() {
   const [user, setUser] = useState<any>(null);
+  const [walletNumber, setWalletNumber] = useState<string>("");
   const [roles, setRoles] = useState<string[]>([]);
   const [loading, setLoading] = useState(true);
   const router = useRouter();
@@ -16,8 +17,19 @@ export default function UserNav() {
       const { data: { session } } = await supabase.auth.getSession();
       if (session) {
         setUser(session.user);
+
+        // جلب رقم المحفظة
+        const { data: wallet } = await supabase
+          .from("wallets")
+          .select("wallet_number")
+          .eq("user_id", session.user.id)
+          .single();
+        
+        if (wallet) setWalletNumber(wallet.wallet_number);
+
+        // جلب الصلاحيات
         const { data } = await supabase.from("user_roles").select("role").eq("user_id", session.user.id);
-        if (data) setRoles(data.map(r => r.role));
+        if (data) setRoles(data.map((r: any) => r.role));
       }
       setLoading(false);
     };
@@ -29,6 +41,7 @@ export default function UserNav() {
         setUser(session.user);
       } else {
         setUser(null);
+        setWalletNumber("");
         setRoles([]);
       }
     });
@@ -59,12 +72,22 @@ export default function UserNav() {
 
   return (
     <div className="flex items-center gap-4">
-      <div className="hidden md:flex items-center gap-3 text-sm font-bold">
+      {/* عرض الاسم ورقم المحفظة */}
+      <div className="hidden md:flex flex-col items-end text-sm">
+        <span className="font-bold text-white">{user.email?.split('@')[0]}</span>
+        <span className="text-xs text-cyan-400">محفظة: {walletNumber || "جاري..."}</span>
+      </div>
+      
+      {/* روابط سريعة حسب الصلاحية */}
+      <div className="hidden md:flex items-center gap-3 text-sm font-bold mr-4">
         {roles.includes("admin") && (
           <Link href="/admin" className="text-yellow-400 hover:text-yellow-300">لوحة الإدارة</Link>
         )}
+        {roles.includes("shipping_agent") && (
+          <Link href="/dashboard/shipping-agent" className="text-cyan-400 hover:text-cyan-300">لوحة الوكيل</Link>
+        )}
       </div>
-      
+
       <button onClick={handleLogout} className="px-3 py-1 bg-red-600/20 text-red-400 hover:bg-red-600/40 text-sm font-bold rounded-lg transition-all">
         تسجيل الخروج
       </button>
