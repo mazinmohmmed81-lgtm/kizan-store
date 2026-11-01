@@ -7,7 +7,7 @@ import Footer from "@/components/Footer";
 const cairo = Cairo({ subsets: ["arabic", "latin"] });
 
 export const metadata: Metadata = {
-  title: "KIZAN STORE | كيزان أستور",
+  title: "ALKYZAN STORE | الكيزان ستور",
   description: "منصة عربية متخصصة في الألعاب والمنتجات الرقمية.",
 };
 
