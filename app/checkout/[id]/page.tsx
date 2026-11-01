@@ -13,7 +13,7 @@ export default function CheckoutPage() {
     setLoading(true);
     const { error } = await supabase.from("orders").update({ status: "paid" }).eq("id", id);
     if (error) alert("خطأ: " + error.message);
-    else { alert("تم الدفع الوهمي!"); router.push(`/messages/${id}`); }
+    else { alert("تم الدفع الوهمي بنجاح!"); router.push(`/messages/${id}`); }
     setLoading(false);
   };
 

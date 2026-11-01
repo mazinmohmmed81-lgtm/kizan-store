@@ -11,7 +11,6 @@ export default function Navbar() {
         <div className="hidden md:flex items-center gap-6 text-sm font-medium text-slate-300">
           <Link href="/accounts" className="hover:text-cyan-400 transition-colors">سوق الحسابات</Link>
           <Link href="/shipping" className="hover:text-cyan-400 transition-colors">شحن الألعاب</Link>
-          <Link href="/deposit" className="hover:text-cyan-400 transition-colors">شحن الرصيد</Link>
           <Link href="/contact" className="hover:text-cyan-400 transition-colors">اتصل بنا</Link>
         </div>
         <UserNav />

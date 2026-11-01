@@ -19,16 +19,11 @@ export default function NewListingPage() {
     if (!user) { router.push("/login"); return; }
 
     const { error } = await supabase.from("listings").insert({
-      merchant_id: user.id,
-      game_name: gameName,
-      title: title,
-      description: description,
-      price: parseFloat(price),
-      status: "pending",
+      merchant_id: user.id, game_name: gameName, title: title, description: description, price: parseFloat(price), currency: "USD", status: "pending",
     });
 
     if (error) alert("خطأ: " + error.message);
-    else { alert("تم الإرسال للأدمن."); router.push("/accounts"); }
+    else { alert("تم الإرسال للأدمن للمراجعة."); router.push("/accounts"); }
     setLoading(false);
   };
 
@@ -38,9 +33,9 @@ export default function NewListingPage() {
       <form onSubmit={handleSubmit} className="bg-slate-900 border border-slate-800 rounded-2xl p-6 space-y-4">
         <input type="text" placeholder="اسم اللعبة" value={gameName} onChange={(e) => setGameName(e.target.value)} className="w-full px-4 py-2 bg-slate-950 border border-slate-700 rounded-lg text-white" required />
         <input type="text" placeholder="عنوان الإعلان" value={title} onChange={(e) => setTitle(e.target.value)} className="w-full px-4 py-2 bg-slate-950 border border-slate-700 rounded-lg text-white" required />
-        <textarea placeholder="وصف الحساب" value={description} onChange={(e) => setDescription(e.target.value)} rows={4} className="w-full px-4 py-2 bg-slate-950 border border-slate-700 rounded-lg text-white" required />
-        <input type="number" placeholder="السعر المقترح (ر.س)" value={price} onChange={(e) => setPrice(e.target.value)} className="w-full px-4 py-2 bg-slate-950 border border-slate-700 rounded-lg text-white" required />
-        <button type="submit" disabled={loading} className="w-full py-3 bg-cyan-600 text-white font-bold rounded-lg">{loading ? "جاري الإرسال..." : "إرسال"}</button>
+        <textarea placeholder="وصف الحساب" value={description} onChange={(e) => setDescription(e.target.value)} rows={4} className="w-full px-4 py-2 bg-slate-950 border border-slate-700 rounded-lg text-white" required></textarea>
+        <input type="number" placeholder="السعر بالدولار ($)" value={price} onChange={(e) => setPrice(e.target.value)} className="w-full px-4 py-2 bg-slate-950 border border-slate-700 rounded-lg text-white" required />
+        <button type="submit" disabled={loading} className="w-full py-3 bg-cyan-600 text-white font-bold rounded-lg">{loading ? "جاري الإرسال..." : "إرسال للأدمن"}</button>
       </form>
     </div>
   );

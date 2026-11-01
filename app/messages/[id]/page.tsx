@@ -33,10 +33,7 @@ export default function ChatPage() {
     e.preventDefault();
     if (!newMessage.trim()) return;
     await supabase.from("chat_messages").insert({
-      deal_id: id,
-      sender_id: user.id,
-      receiver_id: "00000000-0000-0000-0000-000000000000",
-      message: newMessage
+      deal_id: id, sender_id: user.id, receiver_id: "00000000-0000-0000-0000-000000000000", message: newMessage
     });
     setNewMessage("");
   };
