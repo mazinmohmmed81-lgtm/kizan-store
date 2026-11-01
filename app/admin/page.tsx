@@ -1,46 +1,69 @@
+"use client";
+
+import { useEffect, useState } from "react";
+import { supabase } from "@/lib/supabase";
+import { useRouter } from "next/navigation";
 import Link from "next/link";
 
-export default function Home() {
-  return (
-    <div className="flex flex-col items-center justify-center min-h-screen px-4 text-center">
+export default function AdminDashboard() {
+  const [user, setUser] = useState<any>(null);
+  const [loading, setLoading] = useState(true);
+  const router = useRouter();
+
+  useEffect(() => {
+    const checkUser = async () => {
+      const { data: { session } } = await supabase.auth.getSession();
+      if (!session) { router.push("/login"); return; }
       
-      <div className="max-w-3xl space-y-6">
-        <h1 className="text-5xl md:text-7xl font-extrabold tracking-tight">
-          <span className="text-cyan-400">ALKYZAN</span> STORE
-        </h1>
-        <h2 className="text-2xl md:text-4xl font-bold text-slate-300">
-          الكيزان ستور
-        </h2>
-        <p className="text-lg md:text-xl text-slate-400 leading-relaxed">
-          منصتك العربية الأولى لبيع وشراء حسابات الألعاب، شحن الألعاب، 
-          والمنتجات الرقمية بأمان واحترافية عبر وسيط معتمد.
-        </p>
+      const { data: roles } = await supabase.from("user_roles").select("role").eq("user_id", session.user.id);
+      if (!roles?.some((r) => r.role === "admin")) { router.push("/"); return; }
+      
+      setUser(session.user);
+      setLoading(false);
+    };
+    checkUser();
+  }, [router]);
 
-        <div className="flex flex-col sm:flex-row gap-4 justify-center pt-8">
-          <Link href="/accounts" className="px-8 py-4 bg-cyan-600 hover:bg-cyan-500 text-white font-bold rounded-xl transition-all shadow-lg shadow-cyan-600/30">
-            تصفح سوق الحسابات
-          </Link>
-          <Link href="/shipping" className="px-8 py-4 bg-slate-800 hover:bg-slate-700 text-white font-bold rounded-xl transition-all border border-slate-700">
-            شحن الألعاب
-          </Link>
-        </div>
+  if (loading) return <div className="text-center py-20 text-cyan-400">جاري التحميل...</div>;
+
+  return (
+    <div className="max-w-6xl mx-auto px-4 py-12">
+      <div className="flex justify-between items-center mb-12">
+        <h1 className="text-3xl font-bold text-white">لوحة الإدارة</h1>
+        <button onClick={() => { supabase.auth.signOut(); router.push("/"); }} className="px-6 py-2 bg-red-600 hover:bg-red-500 text-white font-bold rounded-lg">تسجيل الخروج</button>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6 max-w-5xl mt-20 w-full">
-        <div className="p-6 bg-slate-900 border border-slate-800 rounded-2xl">
-          <h3 className="text-xl font-bold text-cyan-400 mb-2">وساطة آمنة</h3>
-          <p className="text-slate-400">الإدارة تتولى التفاوض وإتمام الصفقات باحترافية.</p>
-        </div>
-        <div className="p-6 bg-slate-900 border border-slate-800 rounded-2xl">
-          <h3 className="text-xl font-bold text-cyan-400 mb-2">شحن سريع</h3>
-          <p className="text-slate-400">باقات شحن لجميع الألعاب الشهيرة بأسعار تنافسية.</p>
-        </div>
-        <div className="p-6 bg-slate-900 border border-slate-800 rounded-2xl">
-          <h3 className="text-xl font-bold text-cyan-400 mb-2">منتجات رقمية</h3>
-          <p className="text-slate-400">بطاقات، عناصر، وعملات رقمية مسموح ببيعها.</p>
-        </div>
-      </div>
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        <Link href="/admin/users" className="bg-slate-900 border border-slate-800 rounded-2xl p-8 hover:border-cyan-500 transition-colors">
+          <h2 className="text-2xl font-bold text-white mb-2">قائمة المستخدمين والوكلاء</h2>
+          <p className="text-slate-400">عرض جميع الحسابات وأرقام المحافظ.</p>
+        </Link>
+        
+        <Link href="/admin/agents" className="bg-slate-900 border border-slate-800 rounded-2xl p-8 hover:border-cyan-500 transition-colors">
+          <h2 className="text-2xl font-bold text-white mb-2">إدارة الوكلاء</h2>
+          <p className="text-slate-400">إضافة وكيل، وشحن محفظته.</p>
+        </Link>
+        
+        <Link href="/admin/wallets" className="bg-slate-900 border border-slate-800 rounded-2xl p-8 hover:border-cyan-500 transition-colors">
+          <h2 className="text-2xl font-bold text-white mb-2">شحن محافظ العملاء</h2>
+          <p className="text-slate-400">شحن محفظة العميل برقم المحفظة.</p>
+        </Link>
 
+        <Link href="/admin/manage" className="bg-slate-900 border border-slate-800 rounded-2xl p-8 hover:border-cyan-500 transition-colors">
+          <h2 className="text-2xl font-bold text-white mb-2">مراجعة الحسابات</h2>
+          <p className="text-slate-400">مراجعة الحسابات المعلقة والموافقة عليها.</p>
+        </Link>
+
+        <Link href="/admin/products" className="bg-slate-900 border border-slate-800 rounded-2xl p-8 hover:border-cyan-500 transition-colors">
+          <h2 className="text-2xl font-bold text-white mb-2">إدارة المنتجات</h2>
+          <p className="text-slate-400">إضافة المنتجات والصور والكميات.</p>
+        </Link>
+
+        <Link href="/admin/contact" className="bg-slate-900 border border-slate-800 rounded-2xl p-8 hover:border-cyan-500 transition-colors">
+          <h2 className="text-2xl font-bold text-white mb-2">تعديل بيانات الاتصال</h2>
+          <p className="text-slate-400">تعديل أرقام التواصل.</p>
+        </Link>
+      </div>
     </div>
   );
 }

@@ -16,15 +16,8 @@ export default function UserNav() {
       const { data: { session } } = await supabase.auth.getSession();
       if (session) {
         setUser(session.user);
-        
-        const { data } = await supabase
-          .from("user_roles")
-          .select("role")
-          .eq("user_id", session.user.id);
-          
-        if (data) {
-          setRoles(data.map(r => r.role));
-        }
+        const { data } = await supabase.from("user_roles").select("role").eq("user_id", session.user.id);
+        if (data) setRoles(data.map(r => r.role));
       }
       setLoading(false);
     };
@@ -49,9 +42,7 @@ export default function UserNav() {
     router.refresh();
   };
 
-  if (loading) {
-    return <div className="text-sm text-slate-500">...</div>;
-  }
+  if (loading) return <div className="text-sm text-slate-500">...</div>;
 
   if (!user) {
     return (
@@ -69,7 +60,6 @@ export default function UserNav() {
   return (
     <div className="flex items-center gap-4">
       <div className="hidden md:flex items-center gap-3 text-sm font-bold">
-        {/* زر لوحة الإدارة يظهر فقط للمدير */}
         {roles.includes("admin") && (
           <Link href="/admin" className="text-yellow-400 hover:text-yellow-300">لوحة الإدارة</Link>
         )}
