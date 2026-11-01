@@ -10,11 +10,8 @@ export default function AdminUsersPage() {
   useEffect(() => {
     const fetchUsers = async () => {
       try {
-        // جلب الملفات الشخصية
-        const { data: profiles, error: pError } = await supabase.from("profiles").select("*");
-        // جلب المحافظ
+        const { data: profiles } = await supabase.from("profiles").select("*");
         const { data: wallets } = await supabase.from("wallets").select("*");
-        // جلب الأدوار
         const { data: roles } = await supabase.from("user_roles").select("*");
 
         if (profiles) {
