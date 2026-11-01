@@ -18,15 +18,23 @@ export default function AdminAgentsPage() {
 
   const handleAddAgent = async (e: React.FormEvent) => {
     e.preventDefault();
-    const { data: authData, error } = await supabase.auth.admin.createUser({ email, password, email_confirm: true });
+    
+    // نستخدم دالة signUp العادية لإنشاء الحساب
+    const { data: authData, error } = await supabase.auth.signUp({ email, password });
     if (error) { alert(error.message); return; }
     
-    await supabase.from("user_roles").insert({ user_id: authData.user.id, role: "shipping_agent" });
-    const walletNumber = Math.floor(1000 + Math.random() * 9000).toString();
-    await supabase.from("wallets").insert({ user_id: authData.user.id, wallet_number: walletNumber, balance: 0 });
+    if (authData.user) {
+      // إعطاؤه دور وكيل شحن
+      await supabase.from("user_roles").insert({ user_id: authData.user.id, role: "shipping_agent" });
+      // إضافة اسمه للملف الشخصي
+      await supabase.from("profiles").insert({ id: authData.user.id, full_name: "وكيل شحن", email: email });
+      // إنشاء محفظة له برقم عشوائي
+      const walletNumber = Math.floor(1000 + Math.random() * 9000).toString();
+      await supabase.from("wallets").insert({ user_id: authData.user.id, wallet_number: walletNumber, balance: 0 });
 
-    alert(`تمت إضافة الوكيل! رقم محفظته: ${walletNumber}`);
-    setEmail(""); setPassword(""); fetchAgents();
+      alert(`تمت إضافة الوكيل بنجاح! رقم محفظته: ${walletNumber}`);
+      setEmail(""); setPassword(""); fetchAgents();
+    }
   };
 
   const handleCharge = async (userId: string) => {

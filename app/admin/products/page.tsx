@@ -25,6 +25,7 @@ export default function AdminProductsPage() {
     });
     if (!error) {
       setName(""); setQuantity(""); setImageUrl(""); fetchProducts();
+      alert("تمت إضافة المنتج!");
     } else {
       alert("خطأ: " + error.message);
     }
@@ -40,7 +41,7 @@ export default function AdminProductsPage() {
         <form onSubmit={handleAddProduct} className="space-y-4">
           <input type="text" placeholder="اسم المنتج" value={name} onChange={e => setName(e.target.value)} className="w-full px-4 py-2 bg-slate-950 border border-slate-700 rounded-lg text-white" required />
           <input type="number" placeholder="الكمية" value={quantity} onChange={e => setQuantity(e.target.value)} className="w-full px-4 py-2 bg-slate-950 border border-slate-700 rounded-lg text-white" required />
-          <input type="url" placeholder="رابط الصورة" value={imageUrl} onChange={e => setImageUrl(e.target.value)} className="w-full px-4 py-2 bg-slate-950 border border-slate-700 rounded-lg text-white" />
+          <input type="url" placeholder="رابط الصورة (URL)" value={imageUrl} onChange={e => setImageUrl(e.target.value)} className="w-full px-4 py-2 bg-slate-950 border border-slate-700 rounded-lg text-white" />
           <button type="submit" disabled={loading} className="px-6 py-2 bg-cyan-600 text-white font-bold rounded-lg">{loading ? "جاري..." : "إضافة"}</button>
         </form>
       </div>
