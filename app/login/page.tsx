@@ -29,9 +29,9 @@ export default function LoginPage() {
     setLoading(false);
   };
 
-  const handleSocialLogin = async (provider: 'google' | 'apple') => {
+  const handleGoogleLogin = async () => {
     const { error } = await supabase.auth.signInWithOAuth({
-      provider,
+      provider: 'google',
       options: { redirectTo: `${window.location.origin}/` }
     });
     if (error) setMessage("خطأ: " + error.message);
@@ -69,12 +69,10 @@ export default function LoginPage() {
           </button>
         </form>
 
-        <div className="mt-6 space-y-3">
-          <button onClick={() => handleSocialLogin('google')} className="w-full py-2 bg-white text-black font-bold rounded-lg flex items-center justify-center gap-2">
+        {/* زر Google فقط */}
+        <div className="mt-6">
+          <button onClick={handleGoogleLogin} className="w-full py-2 bg-white text-black font-bold rounded-lg flex items-center justify-center gap-2 hover:bg-gray-100 transition-colors">
             الدخول عبر Google
-          </button>
-          <button onClick={() => handleSocialLogin('apple')} className="w-full py-2 bg-black text-white border border-slate-700 font-bold rounded-lg flex items-center justify-center gap-2">
-            الدخول عبر Apple
           </button>
         </div>
 
