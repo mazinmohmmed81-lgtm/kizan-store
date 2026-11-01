@@ -8,16 +8,29 @@ import { supabase } from "@/lib/supabase";
 export default function Navbar() {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const [user, setUser] = useState<any>(null);
+  const [isAdmin, setIsAdmin] = useState(false);
 
   useEffect(() => {
     const getUser = async () => {
       const { data: { session } } = await supabase.auth.getSession();
-      setUser(session?.user || null);
+      if (session) {
+        setUser(session.user);
+        // التحقق من صلاحية المدير
+        const { data: roles } = await supabase
+          .from("user_roles")
+          .select("role")
+          .eq("user_id", session.user.id);
+        
+        if (roles && roles.some((r) => r.role === "admin")) {
+          setIsAdmin(true);
+        }
+      }
     };
     getUser();
 
     const { data: authListener } = supabase.auth.onAuthStateChange((_event, session) => {
       setUser(session?.user || null);
+      if (!session) setIsAdmin(false);
     });
 
     return () => authListener.subscription.unsubscribe();
@@ -28,7 +41,7 @@ export default function Navbar() {
       <nav className="bg-slate-900 border-b border-slate-800 sticky top-0 z-40">
         <div className="max-w-6xl mx-auto px-4 h-16 flex items-center justify-between">
           
-          {/* زر القائمة (يسار) */}
+          {/* زر القائمة (يمين) */}
           <button onClick={() => setIsSidebarOpen(true)} className="text-white text-2xl hover:text-cyan-400 transition-colors">
             ☰
           </button>
@@ -45,12 +58,20 @@ export default function Navbar() {
             <Link href="/contact" className="hover:text-cyan-400 transition-colors">اتصل بنا</Link>
           </div>
 
-          {/* أزرار الدخول/الحساب (يمين) */}
+          {/* أزرار الدخول/الإدارة (يسار) */}
           <div className="flex items-center gap-3">
             {user ? (
-              <Link href="/my-orders" className="text-sm font-bold text-cyan-400 hover:text-cyan-300">
-                حسابي
-              </Link>
+              <>
+                {/* زر لوحة الإدارة يظهر فقط للمدير */}
+                {isAdmin && (
+                  <Link href="/admin" className="px-3 py-1 bg-yellow-500/20 text-yellow-400 font-bold text-sm rounded-lg hover:bg-yellow-500/30 transition-colors">
+                    لوحة الإدارة
+                  </Link>
+                )}
+                <Link href="/my-orders" className="text-sm font-bold text-cyan-400 hover:text-cyan-300">
+                  حسابي
+                </Link>
+              </>
             ) : (
               <>
                 <Link href="/login" className="text-sm font-bold text-slate-300 hover:text-white transition-colors">
