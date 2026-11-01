@@ -1,66 +1,46 @@
-"use client";
+import Link from "next/link";
 
-import { useEffect, useState } from "react";
-import { supabase } from "@/lib/supabase";
-import { useRouter } from "next/navigation";
-
-export default function ShippingPage() {
-  const [packages, setPackages] = useState<any[]>([]);
-  const [user, setUser] = useState<any>(null);
-  const [balance, setBalance] = useState<number>(0);
-  const [selectedPackage, setSelectedPackage] = useState<any>(null);
-  const [playerId, setPlayerId] = useState("");
-  const router = useRouter();
-
-  useEffect(() => {
-    const init = async () => {
-      const { data: { session } } = await supabase.auth.getSession();
-      if (session) {
-        setUser(session.user);
-        const { data: wallet } = await supabase.from("wallets").select("balance").eq("user_id", session.user.id).single();
-        if (wallet) setBalance(wallet.balance);
-      }
-      const { data } = await supabase.from("shipping_packages").select("*");
-      if (data) setPackages(data);
-    };
-    init();
-  }, []);
-
-  const handleOrder = async () => {
-    if (!user) { router.push("/login"); return; }
-    if (balance < selectedPackage.price_agent) { alert("رصيد غير كافٍ"); return; }
-    
-    await supabase.rpc('add_wallet_balance', { p_user_id: user.id, p_amount: -selectedPackage.price_agent, p_description: `شحن ${selectedPackage.package_name}` });
-    await supabase.from("shipping_orders").insert({ agent_id: user.id, package_id: selectedPackage.id, player_id: playerId, status: "new" });
-    alert("تم الطلب وخصم المبلغ!");
-    setBalance(balance - selectedPackage.price_agent); setSelectedPackage(null);
-  };
-
+export default function Home() {
   return (
-    <div className="max-w-6xl mx-auto px-4 py-12">
-      <h1 className="text-3xl font-bold text-white mb-8">شحن الألعاب</h1>
-      {user && <div className="mb-4 text-green-400 font-bold">رصيدك: {balance} $</div>}
+    <div className="flex flex-col items-center justify-center min-h-screen px-4 text-center">
       
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-        {packages.map(pkg => (
-          <div key={pkg.id} className="bg-slate-900 border border-slate-800 p-6 rounded-2xl">
-            <h3 className="text-xl font-bold text-white">{pkg.package_name}</h3>
-            <p className="text-2xl text-cyan-400 font-bold">{pkg.price_agent} $</p>
-            <button onClick={() => setSelectedPackage(pkg)} className="mt-4 w-full py-2 bg-cyan-600 text-white font-bold rounded-lg">شراء</button>
-          </div>
-        ))}
+      <div className="max-w-3xl space-y-6">
+        <h1 className="text-5xl md:text-7xl font-extrabold tracking-tight">
+          <span className="text-cyan-400">ALKYZAN</span> STORE
+        </h1>
+        <h2 className="text-2xl md:text-4xl font-bold text-slate-300">
+          الكيزان ستور
+        </h2>
+        <p className="text-lg md:text-xl text-slate-400 leading-relaxed">
+          منصتك العربية الأولى لبيع وشراء حسابات الألعاب، شحن الألعاب، 
+          والمنتجات الرقمية بأمان واحترافية عبر وسيط معتمد.
+        </p>
+
+        <div className="flex flex-col sm:flex-row gap-4 justify-center pt-8">
+          <Link href="/accounts" className="px-8 py-4 bg-cyan-600 hover:bg-cyan-500 text-white font-bold rounded-xl transition-all shadow-lg shadow-cyan-600/30">
+            تصفح سوق الحسابات
+          </Link>
+          <Link href="/shipping" className="px-8 py-4 bg-slate-800 hover:bg-slate-700 text-white font-bold rounded-xl transition-all border border-slate-700">
+            شحن الألعاب
+          </Link>
+        </div>
       </div>
 
-      {selectedPackage && (
-        <div className="fixed inset-0 bg-black/80 flex items-center justify-center p-4">
-          <div className="bg-slate-900 p-8 rounded-2xl max-w-md w-full">
-            <h2 className="text-xl text-white font-bold mb-4">أدخل معرف اللاعب</h2>
-            <input type="text" placeholder="Player ID" value={playerId} onChange={e => setPlayerId(e.target.value)} className="w-full px-4 py-2 bg-slate-950 text-white border border-slate-700 rounded-lg mb-4" />
-            <button onClick={handleOrder} className="w-full py-2 bg-green-600 text-white font-bold rounded-lg">تأكيد الدفع</button>
-            <button onClick={() => setSelectedPackage(null)} className="mt-2 w-full text-slate-400">إلغاء</button>
-          </div>
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-6 max-w-5xl mt-20 w-full">
+        <div className="p-6 bg-slate-900 border border-slate-800 rounded-2xl">
+          <h3 className="text-xl font-bold text-cyan-400 mb-2">وساطة آمنة</h3>
+          <p className="text-slate-400">الإدارة تتولى التفاوض وإتمام الصفقات باحترافية.</p>
         </div>
-      )}
+        <div className="p-6 bg-slate-900 border border-slate-800 rounded-2xl">
+          <h3 className="text-xl font-bold text-cyan-400 mb-2">شحن سريع</h3>
+          <p className="text-slate-400">باقات شحن لجميع الألعاب الشهيرة بأسعار تنافسية.</p>
+        </div>
+        <div className="p-6 bg-slate-900 border border-slate-800 rounded-2xl">
+          <h3 className="text-xl font-bold text-cyan-400 mb-2">منتجات رقمية</h3>
+          <p className="text-slate-400">بطاقات، عناصر، وعملات رقمية مسموح ببيعها.</p>
+        </div>
+      </div>
+
     </div>
   );
 }
