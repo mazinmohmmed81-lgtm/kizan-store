@@ -9,25 +9,32 @@ export default function AdminUsersPage() {
 
   useEffect(() => {
     const fetchUsers = async () => {
-      // جلب المستخدمين مع المحافظ
-      const { data: profiles } = await supabase.from("profiles").select("*");
-      const { data: wallets } = await supabase.from("wallets").select("*");
-      const { data: roles } = await supabase.from("user_roles").select("*");
+      try {
+        // جلب الملفات الشخصية
+        const { data: profiles, error: pError } = await supabase.from("profiles").select("*");
+        // جلب المحافظ
+        const { data: wallets } = await supabase.from("wallets").select("*");
+        // جلب الأدوار
+        const { data: roles } = await supabase.from("user_roles").select("*");
 
-      if (profiles) {
-        const combined = profiles.map(p => {
-          const userWallet = wallets?.find(w => w.user_id === p.id);
-          const userRole = roles?.find(r => r.user_id === p.id);
-          return {
-            ...p,
-            wallet_number: userWallet?.wallet_number || "لا يوجد",
-            balance: userWallet?.balance || 0,
-            role: userRole?.role || "buyer"
-          };
-        });
-        setUsers(combined);
+        if (profiles) {
+          const combined = profiles.map(p => {
+            const userWallet = wallets?.find(w => w.user_id === p.id);
+            const userRole = roles?.find(r => r.user_id === p.id);
+            return {
+              ...p,
+              wallet_number: userWallet?.wallet_number || "لا يوجد",
+              balance: userWallet?.balance || 0,
+              role: userRole?.role || "buyer"
+            };
+          });
+          setUsers(combined);
+        }
+      } catch (err) {
+        console.log(err);
+      } finally {
+        setLoading(false);
       }
-      setLoading(false);
     };
     fetchUsers();
   }, []);
