@@ -1,7 +1,7 @@
 import ChatClient from "./ChatClient";
 
 export function generateStaticParams() {
-  return [];
+  return [{ id: "dummy" }];
 }
 
 export default function ChatPage() {

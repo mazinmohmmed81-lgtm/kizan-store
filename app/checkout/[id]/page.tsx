@@ -1,7 +1,7 @@
 import CheckoutClient from "./CheckoutClient";
 
 export function generateStaticParams() {
-  return [];
+  return [{ id: "dummy" }];
 }
 
 export default function CheckoutPage() {
