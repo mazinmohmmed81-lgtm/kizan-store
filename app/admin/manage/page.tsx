@@ -30,7 +30,7 @@ export default function AdminManagePage() {
 
   return (
     <div className="max-w-6xl mx-auto px-4 py-12">
-      <h1 className="text-3xl font-bold text-white mb-8">لوحة الإدارة - المراجعة والمنتجات</h1>
+      <h1 className="text-3xl font-bold text-white mb-8">لوحة الإدارة - المراجعة</h1>
 
       <div className="bg-slate-900 border border-slate-800 rounded-2xl p-6 mb-8">
         <h2 className="text-xl font-bold text-white mb-4">مراجعة الحسابات المعلقة</h2>
