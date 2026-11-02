@@ -11,10 +11,14 @@ export default function Navbar() {
   const [isAdmin, setIsAdmin] = useState(false);
 
   useEffect(() => {
-    const getUser = async () => {
+    // دالة لجلب المستخدم وصلاحياته
+    const checkUser = async () => {
       const { data: { session } } = await supabase.auth.getSession();
+      
       if (session) {
         setUser(session.user);
+        
+        // التحقق من صلاحية المدير
         const { data: roles } = await supabase
           .from("user_roles")
           .select("role")
@@ -23,13 +27,22 @@ export default function Navbar() {
         if (roles && roles.some((r: any) => r.role === "admin")) {
           setIsAdmin(true);
         }
+      } else {
+        setUser(null);
+        setIsAdmin(false);
       }
     };
-    getUser();
 
+    checkUser();
+
+    // الاستماع لتغييرات تسجيل الدخول (لحظة الدخول أو الخروج)
     const { data: authListener } = supabase.auth.onAuthStateChange((_event, session) => {
-      setUser(session?.user || null);
-      if (!session) setIsAdmin(false);
+      if (session) {
+        setUser(session.user);
+      } else {
+        setUser(null);
+        setIsAdmin(false);
+      }
     });
 
     return () => authListener.subscription.unsubscribe();
@@ -40,33 +53,41 @@ export default function Navbar() {
       <nav className="bg-slate-900 border-b border-slate-800 sticky top-0 z-40">
         <div className="max-w-6xl mx-auto px-4 h-16 flex items-center justify-between">
           
+          {/* زر القائمة (يمين) */}
           <button onClick={() => setIsSidebarOpen(true)} className="text-white text-2xl hover:text-cyan-400 transition-colors">
             ☰
           </button>
 
+          {/* الشعار (وسط) */}
           <Link href="/" className="text-2xl font-extrabold tracking-tight">
             <span className="text-cyan-400">ALKYZAN</span> STORE
           </Link>
 
+          {/* روابط التنقل (للكمبيوتر) */}
           <div className="hidden md:flex items-center gap-6 text-sm font-medium text-slate-300">
             <Link href="/accounts" className="hover:text-cyan-400 transition-colors">سوق الحسابات</Link>
             <Link href="/shipping" className="hover:text-cyan-400 transition-colors">شحن الألعاب</Link>
             <Link href="/contact" className="hover:text-cyan-400 transition-colors">اتصل بنا</Link>
           </div>
 
+          {/* أزرار الدخول/الإدارة (يسار) */}
           <div className="flex items-center gap-3">
             {user ? (
+              // إذا كان المستخدم مسجل دخول
               <>
+                {/* زر لوحة الإدارة (يظهر فقط للمدير) */}
                 {isAdmin && (
                   <Link href="/admin" className="px-3 py-1 bg-yellow-500/20 text-yellow-400 font-bold text-sm rounded-lg hover:bg-yellow-500/30 transition-colors">
                     لوحة الإدارة
                   </Link>
                 )}
+                {/* زر حسابي */}
                 <Link href="/my-orders" className="text-sm font-bold text-cyan-400 hover:text-cyan-300">
                   حسابي
                 </Link>
               </>
             ) : (
+              // إذا لم يكن مسجلاً للدخول
               <>
                 <Link href="/login" className="text-sm font-bold text-slate-300 hover:text-white transition-colors">
                   تسجيل الدخول
@@ -80,6 +101,7 @@ export default function Navbar() {
         </div>
       </nav>
 
+      {/* الشريط الجانبي */}
       <Sidebar isOpen={isSidebarOpen} onClose={() => setIsSidebarOpen(false)} />
     </>
   );
