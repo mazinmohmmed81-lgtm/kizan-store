@@ -21,7 +21,7 @@ export default function Navbar() {
           .select("role")
           .eq("user_id", session.user.id);
         
-        if (roles && roles.some((r) => r.role === "admin")) {
+        if (roles && roles.some((r: any) => r.role === "admin")) {
           setIsAdmin(true);
         }
       }
