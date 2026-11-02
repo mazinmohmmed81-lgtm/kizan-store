@@ -9,6 +9,7 @@ export default function Sidebar({ isOpen, onClose }: { isOpen: boolean, onClose:
   const [user, setUser] = useState<any>(null);
   const [wallet, setWallet] = useState<any>(null);
   const [cartCount, setCartCount] = useState(0);
+  const [loading, setLoading] = useState(true);
   const router = useRouter();
 
   useEffect(() => {
@@ -18,13 +19,23 @@ export default function Sidebar({ isOpen, onClose }: { isOpen: boolean, onClose:
         setUser(session.user);
         
         // جلب المحفظة
-        const { data: w } = await supabase.from("wallets").select("*").eq("user_id", session.user.id).single();
+        const { data: w } = await supabase
+          .from("wallets")
+          .select("*")
+          .eq("user_id", session.user.id)
+          .single();
+        
         if (w) setWallet(w);
 
         // جلب عدد السلة
-        const { count } = await supabase.from("cart_items").select("*", { count: 'exact', head: true }).eq("user_id", session.user.id);
+        const { count } = await supabase
+          .from("cart_items")
+          .select("*", { count: 'exact', head: true })
+          .eq("user_id", session.user.id);
+        
         if (count) setCartCount(count);
       }
+      setLoading(false);
     };
     if (isOpen) fetchData();
   }, [isOpen]);
@@ -40,22 +51,22 @@ export default function Sidebar({ isOpen, onClose }: { isOpen: boolean, onClose:
 
   return (
     <div className="fixed inset-0 z-50 flex justify-end">
-      {/* الخلفية المعتمة */}
       <div className="absolute inset-0 bg-black/60" onClick={onClose}></div>
       
-      {/* الشريط الجانبي */}
-      <div className="relative w-80 bg-slate-900 h-full shadow-2xl flex flex-col p-6 animate-slide-in">
+      <div className="relative w-80 bg-slate-900 h-full shadow-2xl flex flex-col p-6">
         <button onClick={onClose} className="self-end text-slate-400 hover:text-white mb-6">✕ إغلاق</button>
         
-        {user ? (
+        {loading ? (
+          <div className="text-center text-slate-400">جاري التحميل...</div>
+        ) : user ? (
           <>
-            {/* بيانات المستخدم */}
             <div className="bg-slate-950 p-4 rounded-xl mb-6 border border-slate-800 text-center">
               <p className="text-white font-bold text-lg">{user.email?.split('@')[0]}</p>
-              <p className="text-cyan-400 text-sm mt-1">رقم المحفظة: {wallet?.wallet_number || "..."}</p>
+              <p className="text-cyan-400 text-sm mt-1">
+                رقم المحفظة: {wallet?.wallet_number || "غير متوفر"}
+              </p>
             </div>
 
-            {/* المحفظة والسلة */}
             <div className="grid grid-cols-2 gap-4 mb-6">
               <div className="bg-slate-950 p-4 rounded-xl border border-slate-800 text-center">
                 <p className="text-slate-400 text-xs mb-1">المحفظة</p>
@@ -67,7 +78,6 @@ export default function Sidebar({ isOpen, onClose }: { isOpen: boolean, onClose:
               </div>
             </div>
 
-            {/* روابط التنقل */}
             <div className="flex flex-col gap-3 text-slate-300">
               <Link href="/accounts" onClick={onClose} className="hover:text-cyan-400">سوق الحسابات</Link>
               <Link href="/shipping" onClick={onClose} className="hover:text-cyan-400">شحن الألعاب</Link>
