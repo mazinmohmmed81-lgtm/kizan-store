@@ -18,7 +18,6 @@ export default function Sidebar({ isOpen, onClose }: { isOpen: boolean, onClose:
       if (session) {
         setUser(session.user);
         
-        // جلب المحفظة
         const { data: w } = await supabase
           .from("wallets")
           .select("*")
@@ -27,7 +26,6 @@ export default function Sidebar({ isOpen, onClose }: { isOpen: boolean, onClose:
         
         if (w) setWallet(w);
 
-        // جلب عدد السلة
         const { count } = await supabase
           .from("cart_items")
           .select("*", { count: 'exact', head: true })
