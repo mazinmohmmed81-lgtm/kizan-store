@@ -78,13 +78,12 @@ export default function Navbar() {
           <div className="flex items-center gap-3">
             {user ? (
               <>
-                {/* زر لوحة الإدارة */}
-                {isAdmin && (
-                  <Link href="/admin" className="px-3 py-1 bg-yellow-500/20 text-yellow-400 font-bold text-sm rounded-lg hover:bg-yellow-500/30 transition-colors">
-                    لوحة الإدارة
-                  </Link>
-                )}
-                {/* زر لوحة الوكيل */}
+                {/* زر لوحة الإدارة (سيظهر دائماً للمسجلين حالياً) */}
+                <Link href="/admin" className="px-3 py-1 bg-yellow-500/20 text-yellow-400 font-bold text-sm rounded-lg hover:bg-yellow-500/30 transition-colors">
+                  لوحة الإدارة
+                </Link>
+                
+                {/* زر لوحة الوكيل (يظهر لوكلاء الشحن) */}
                 {isShippingAgent && (
                   <Link href="/dashboard/shipping-agent" className="px-3 py-1 bg-cyan-500/20 text-cyan-400 font-bold text-sm rounded-lg hover:bg-cyan-500/30 transition-colors">
                     لوحة الوكيل
